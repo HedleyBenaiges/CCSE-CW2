@@ -1,0 +1,15 @@
+.loginContainer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+.email {
+    display: flex;
+}
+.password {
+    display: flex;
+}
+.address {
+    display: flex;
+}
