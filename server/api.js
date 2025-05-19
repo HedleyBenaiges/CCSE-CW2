@@ -39,11 +39,16 @@ router.get("/products/", async (req, res) => {
 
 // Get product by ID
 router.get("/products/:id", async (req, res) => {
-    const _product = await products.findByPk(req.params.id);
-    // TODO: following line
-    // if (_products == null) return res.sendStatus(401); // If no product found
-    res.json(_product);
+    try {
+        const _product = await products.findByPk(req.params.id);
+        res.json(_product);
+    } catch (error) { return res.json(null) }; // If malformed ID
+    // Returns null so client can handle it as 'product not found'
 });
+
+// TODO: following line
+// if (_products == null) return res.sendStatus(401); // If no product found
+
 
 // Takes "product_name" value from post request
 // Return all products with similar name (iLike = case insensitive)
@@ -93,7 +98,9 @@ router.post("/users/login", async (req, res) => {
 
     const payload = { user_id: _user.user_id, email: email, privilege: _user.privilege };
 
-    // Authenticate user with JWT
+    // TODO: Server not finding ACCESS_TOKEN_SECRET
+    if (!process.env.ACCESS_TOKEN_SECRET) return res.sendStatus(500); // If no secret found
+
     if (bcrypt.compareSync(password, _user.password)) {
         // If passwords match, it will create a JWT for the user
         // Signs the JWT with ACCESS_TOKEN_SECRET from .env file
