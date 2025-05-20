@@ -12,7 +12,7 @@ jobs:
       - name: Run Snyk to check for vulnerabilites on server
         uses: snyk/actions/node@master # Image: snyk/snyk:node-18 ?
         with:
-          args: --all-projects --package-manager=npm # --file=./server 
+          args: --all-projects # --package-manager=npm # --file=./server 
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
