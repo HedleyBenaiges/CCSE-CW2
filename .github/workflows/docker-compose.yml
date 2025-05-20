@@ -4,15 +4,31 @@ on:
   push:
 
 jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4 # Clones repo to $GITHUB_WORKSPACE
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: npm install
+      - name: Run unit tests
+        run: npm test
+      - name: Run linter
+        run: npm run lint
   security:
     runs-on: ubuntu-latest
+    needs: unit-tests
     steps:
       - name: Checkout
         uses: actions/checkout@v4 # Clones repo to $GITHUB_WORKSPACE
       - name: Run Snyk to check for vulnerabilites on server
         uses: snyk/actions/node@master # Image: snyk/snyk:node-18 ?
         with:
-          args: --all-projects # --package-manager=npm # --file=./server 
+          args: --all-projects # --file=./server --package-manager=npm 
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -44,7 +60,7 @@ jobs:
       - name: List Docker Images
         run: docker images
 
-      - name: Build with docker compose
+      - name: Push to Docker Hub
         run: | 
           PROJECT_NAME="ccse-cw2"
           IMAGE_TAG="${{ github.sha }}"
@@ -64,12 +80,3 @@ jobs:
           docker push "${DOCKERHUB_REPO}:client-${IMAGE_TAG}"
           docker tag "${PROJECT_NAME}-client:latest" "${DOCKERHUB_REPO}:client-latest"
           docker push "${DOCKERHUB_REPO}:client-latest"
-
-
-            
-            # build:
-            # runs-on: ubuntu-latest
-            # steps:
-            # - uses: actions/checkout@v4
-            # - name: Build the Docker Image
-            # run: docker compose up --build
