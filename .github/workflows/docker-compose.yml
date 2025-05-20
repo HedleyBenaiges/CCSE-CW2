@@ -23,7 +23,7 @@ jobs:
     services:
       docker:dind:
         image: docker:dind # Docker in Docker
-        options: --privileged # For Docker in Docker
+        options: --privileged # Required for DinD
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,6 +34,25 @@ jobs:
 
       - name: Build with Docker compose
         run: docker compose build
+          PROJECT_NAME = "ccse-cw2"
+          IMAGE_TAG="${{ github.sha }}"
+          DOCKERHUB_REPO="hedleyb/ccse-cw2"
+
+          docker tag "${PROJECT_NAME}_db:latest" "${TARGET_DOCKER_REPO}:db-${IMAGE_TAG}"
+          docker push "${TARGET_DOCKER_REPO}:db-${IMAGE_TAG}"
+          docker tag "${PROJECT_NAME}_db:latest" "${TARGET_DOCKER_REPO}:db-latest" 
+          docker push "${TARGET_DOCKER_REPO}:db-latest"
+
+          docker tag "${PROJECT_NAME}_server:latest" "${TARGET_DOCKER_REPO}:server-${IMAGE_TAG}"
+          docker push "${TARGET_DOCKER_REPO}:server-${IMAGE_TAG}"
+          docker tag "${PROJECT_NAME}_server:latest" "${TARGET_DOCKER_REPO}:server-latest"
+          docker push "${TARGET_DOCKER_REPO}:server-latest"
+
+          docker tag "${PROJECT_NAME}_client:latest" "${TARGET_DOCKER_REPO}:client-${IMAGE_TAG}"
+          docker push "${TARGET_DOCKER_REPO}:client-${IMAGE_TAG}"
+          docker tag "${PROJECT_NAME}_client:latest" "${TARGET_DOCKER_REPO}:client-latest"
+          docker push "${TARGET_DOCKER_REPO}:client-latest"
+
 
       # Docker Hub Login and Push
       - name: Login to Docker Hub
@@ -43,7 +62,8 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build with docker compose
-        run: docker push "hedleyb/ccse-cw2:latest"
+        run: | 
+          docker push "hedleyb/ccse-cw2:latest"
             
             # build:
             # runs-on: ubuntu-latest
