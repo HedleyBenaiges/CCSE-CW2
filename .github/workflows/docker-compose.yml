@@ -48,20 +48,20 @@ jobs:
           IMAGE_TAG="${{ github.sha }}"
           DOCKERHUB_REPO="hedleyb/ccse-cw2"
 
-          docker tag "${PROJECT_NAME}_db:latest" "${TARGET_DOCKER_REPO}:db-${IMAGE_TAG}"
-          docker push "${TARGET_DOCKER_REPO}:db-${IMAGE_TAG}"
-          docker tag "${PROJECT_NAME}_db:latest" "${TARGET_DOCKER_REPO}:db-latest" 
-          docker push "${TARGET_DOCKER_REPO}:db-latest"
+          docker tag "${PROJECT_NAME}_db:latest" "${DOCKERHUB_REPO}:db-${IMAGE_TAG}"
+          docker push "${DOCKERHUB_REPO}:db-${IMAGE_TAG}"
+          docker tag "${PROJECT_NAME}_db:latest" "${DOCKERHUB_REPO}:db-latest" 
+          docker push "${DOCKERHUB_REPO}:db-latest"
 
-          docker tag "${PROJECT_NAME}_server:latest" "${TARGET_DOCKER_REPO}:server-${IMAGE_TAG}"
-          docker push "${TARGET_DOCKER_REPO}:server-${IMAGE_TAG}"
-          docker tag "${PROJECT_NAME}_server:latest" "${TARGET_DOCKER_REPO}:server-latest"
-          docker push "${TARGET_DOCKER_REPO}:server-latest"
+          docker tag "${PROJECT_NAME}_server:latest" "${DOCKERHUB_REPO}:server-${IMAGE_TAG}"
+          docker push "${DOCKERHUB_REPO}:server-${IMAGE_TAG}"
+          docker tag "${PROJECT_NAME}_server:latest" "${DOCKERHUB_REPO}:server-latest"
+          docker push "${DOCKERHUB_REPO}:server-latest"
 
-          docker tag "${PROJECT_NAME}_client:latest" "${TARGET_DOCKER_REPO}:client-${IMAGE_TAG}"
-          docker push "${TARGET_DOCKER_REPO}:client-${IMAGE_TAG}"
-          docker tag "${PROJECT_NAME}_client:latest" "${TARGET_DOCKER_REPO}:client-latest"
-          docker push "${TARGET_DOCKER_REPO}:client-latest"
+          docker tag "${PROJECT_NAME}_client:latest" "${DOCKERHUB_REPO}:client-${IMAGE_TAG}"
+          docker push "${DOCKERHUB_REPO}:client-${IMAGE_TAG}"
+          docker tag "${PROJECT_NAME}_client:latest" "${DOCKERHUB_REPO}:client-latest"
+          docker push "${DOCKERHUB_REPO}:client-latest"
 
 
             
