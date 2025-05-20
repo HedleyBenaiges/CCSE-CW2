@@ -41,6 +41,8 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: List Docker Images
+        run: docker images
 
       - name: Build with docker compose
         run: | 
