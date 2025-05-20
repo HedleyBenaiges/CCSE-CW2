@@ -7,7 +7,8 @@ jobs:
   security:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Run Snyk to check for vulnerabilites
         uses: snyk/actions/node@master # Image: snyk/snyk:node-18 ?
         continue-on-error: true
@@ -29,8 +30,8 @@ jobs:
         # Set up Docker Buildx
         
         # Not sure what these are for, not described in build-and-push
-        # - name: Checkout
-        # uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Set up QEMU # adds support to more platforms (optional)
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
