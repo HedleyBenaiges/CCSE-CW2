@@ -44,7 +44,7 @@ jobs:
 
       - name: Build with docker compose
         run: | 
-          PROJECT_NAME = "ccse-cw2"
+          PROJECT_NAME="ccse-cw2"
           IMAGE_TAG="${{ github.sha }}"
           DOCKERHUB_REPO="hedleyb/ccse-cw2"
 
