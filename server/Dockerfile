@@ -1,7 +1,6 @@
 # Use base Docker image: node:20-alpine (Linux distro w/ node installed)
 FROM node:20-alpine
 
-RUN touch hehehehe
 # Set working directory in container
 WORKDIR /app
 
