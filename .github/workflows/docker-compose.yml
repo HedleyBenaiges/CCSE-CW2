@@ -8,9 +8,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Run Snyk to check for vulnerabilites
+        uses: actions/checkout@v4 # Clones repo to $GITHUB_WORKSPACE
+      - name: Run Snyk to check for vulnerabilites on server
         uses: snyk/actions/node@master # Image: snyk/snyk:node-18 ?
+        with:
+          args: --file=./server
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
