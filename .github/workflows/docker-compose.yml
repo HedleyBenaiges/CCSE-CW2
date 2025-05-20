@@ -56,28 +56,32 @@ jobs:
           IMAGE_TAG="${{ github.sha }}"
           DOCKERHUB_REPO="hedleyb/ccse-cw2"
 
-          docker tag "${PROJECT_NAME}-db:latest" "${DOCKERHUB_REPO}:db-${IMAGE_TAG}"
+          # Local image name: ccse-cw2-db:latest
+          # Docker Hub image name: hedleyb/ccse-cw2-db:latest
+          docker tag "${PROJECT_NAME}-db:latest" "${DOCKERHUB_REPO}-db:${IMAGE_TAG}"
           docker push "${DOCKERHUB_REPO}-db:${IMAGE_TAG}"
-          docker tag "${PROJECT_NAME}-db:latest" "${DOCKERHUB_REPO}:db-latest" 
+          docker tag "${PROJECT_NAME}-db:latest" "hedleyb/ccse-cw2-db:latest" 
           docker push "${DOCKERHUB_REPO}-db:latest"
 
-          docker tag "${PROJECT_NAME}-server:latest" "${DOCKERHUB_REPO}:server-${IMAGE_TAG}"
+          docker tag "${PROJECT_NAME}-server:latest" "${DOCKERHUB_REPO}-server:${IMAGE_TAG}"
           docker push "${DOCKERHUB_REPO}-server:${IMAGE_TAG}"
-          docker tag "${PROJECT_NAME}-server:latest" "${DOCKERHUB_REPO}:server-latest"
+          docker tag "${PROJECT_NAME}-server:latest" "hedleyb/ccse-cw2-server:latest"
           docker push "${DOCKERHUB_REPO}-server:latest"
 
-          docker tag "${PROJECT_NAME}-client:latest" "${DOCKERHUB_REPO}:client-${IMAGE_TAG}"
+          docker tag "${PROJECT_NAME}-client:latest" "${DOCKERHUB_REPO}-client:${IMAGE_TAG}"
           docker push "${DOCKERHUB_REPO}-client:${IMAGE_TAG}"
-          docker tag "${PROJECT_NAME}-client:latest" "${DOCKERHUB_REPO}:client-latest"
+          docker tag "${PROJECT_NAME}-client:latest" "hedleyb/ccse-cw2-client:latest"
           docker push "${DOCKERHUB_REPO}-client:latest"
-  # deploy:
-  #   name: Deploy to Render
-  #   needs: docker
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Trigger deployment
-  #       uses: sws2apps/render-deployment@main # consider using pin for dependabot auto update
-  #       with:
-  #         serviceId: ${{ secrets.RENDER_SERVICE_ID }}
-  #         apiKey: ${{ secrets.RENDER_API_KEY }}
-  #         multipleDeployment: false # default is true
+  deploy:
+    name: Deploy to Render
+    needs: docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Trigger deployment
+        uses: sws2apps/render-deployment@main # consider using pin for dependabot auto update
+        with:
+          serviceId: ${{ secrets.RENDER_SERVICE_ID }}
+          apiKey: ${{ secrets.RENDER_API_KEY }}
+          multipleDeployment: false # default is true
