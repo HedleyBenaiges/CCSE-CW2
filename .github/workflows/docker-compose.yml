@@ -58,6 +58,7 @@ jobs:
 
           # Local image name: ccse-cw2-db:latest
           # Docker Hub image name: hedleyb/ccse-cw2-db:latest
+          # Alt: Docker Hub image: hedleyb/ccse-cw2:db-latest # Not doing thia
           docker tag "${PROJECT_NAME}-db:latest" "${DOCKERHUB_REPO}-db:${IMAGE_TAG}"
           docker push "${DOCKERHUB_REPO}-db:${IMAGE_TAG}"
           docker tag "${PROJECT_NAME}-db:latest" "hedleyb/ccse-cw2-db:latest" 
@@ -77,11 +78,42 @@ jobs:
     needs: docker
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Trigger deployment
-        uses: sws2apps/render-deployment@main # consider using pin for dependabot auto update
+      - name: Deploy Database
+        uses: gh-actions-workflows/deploy-docker-render@v1.1
         with:
-          serviceId: ${{ secrets.RENDER_SERVICE_ID }}
-          apiKey: ${{ secrets.RENDER_API_KEY }}
-          multipleDeployment: false # default is true
+          deploy-hook: ${{ secrets.RENDER_DEPLOY_HOOK }}
+          image-url: ${{ needs.publish.outputs.image_name }}
+          render-api-key: ${{ secrets.RENDER_API_KEY }}
+          wait-for-deploy: true
+
+      - name: Deploy Server
+        uses: gh-actions-workflows/deploy-docker-render@v1.1
+        with:
+          deploy-hook: ${{ secrets.RENDER_DEPLOY_HOOK }}
+          image-url: ${{ needs.publish.outputs.image_name }}
+          render-api-key: ${{ secrets.RENDER_API_KEY }}
+          wait-for-deploy: true
+
+      - name: Deploy Client
+        uses: gh-actions-workflows/deploy-docker-render@v1.1
+        with:
+          deploy-hook: ${{ secrets.RENDER_DEPLOY_HOOK }}
+          image-url: ${{ needs.publish.outputs.image_name }}
+          render-api-key: ${{ secrets.RENDER_API_KEY }}
+          wait-for-deploy: true
+
+
+
+    #   - name: Checkout
+    #     uses: actions/checkout@v4
+    #   - name: Trigger deployment
+    #     uses: sws2apps/render-deployment@main # consider using pin for dependabot auto update
+    #     with:
+    #       serviceId: ${{ secrets.RENDER_SERVICE_ID }}
+    #       apiKey: ${{ secrets.RENDER_API_KEY }}
+    #       multipleDeployment: false # default is true
+
+
+
+          # TODO: add localhost URL to .env file
+          # This way it can be replaced when deploying to Render
