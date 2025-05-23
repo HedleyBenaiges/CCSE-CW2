@@ -54,12 +54,32 @@ jobs:
           docker save "${PROJECT_NAME}-db:latest" -o ./images/${PROJECT_NAME}-db.tar
           docker save "${PROJECT_NAME}-server:latest" -o ./images/${PROJECT_NAME}-server.tar
           docker save "${PROJECT_NAME}-client:latest" -o ./images/${PROJECT_NAME}-client.tar
-      - name: Upload Docker Images as Artifacts
-        uses: actions/upload-artifact@v4
+      
+      # -------------------------- FROM HERE --------------------------
+      - name: Define Cache key
+        id: cache-key-gen
+        run: echo "cache_key=${{ runner.os }}-docker-images-${{ github.sha }}-${{ hashFiles('**/Dockerfile', 'docker-compose.yml') }}" >> $GITHUB_OUTPUT
+
+      - name: Cache Docker Images (.tar files)
+        uses: actions/cache@v4
+        id: cache-images-save
         with:
-          name: docker-images
-          path: ./images/
-          retention-days: 1 # Adjust retention as needed
+          path: ./images/ # The directory where your .tar files are saved
+          key: ${{ steps.cache-key-gen.outputs.cache_key }}
+          restore-keys: |
+            ${{ runner.os }}-docker-images-
+            ${{ runner.os }}-
+        # Only save if the cache was not hit on restore (i.e., we built new images)
+        # Or if the cache was just created successfully.
+        if: success() && steps.cache-images-save.outputs.cache-hit != 'true'
+        # ------------------------------ TO HERE ------------------------------
+
+      # - name: Upload Docker Images as Artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: docker-images
+      #     path: ./images/
+      #     retention-days: 1 # Adjust retention as needed
 
   integration_testing:
     needs:
@@ -71,17 +91,30 @@ jobs:
         image: docker:dind # Docker in Docker
         options: --privileged # Required for DinD
     steps:
-      - name: Download Docker Images Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: docker-images
-          path: ./images/
+      # - name: Download Docker Images Artifacts
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: docker-images
+      #     path: ./images/
+      # - name: Load Docker Images
+      #   run: |
+      #     PROJECT_NAME="ccse-cw2"
+      #     docker load -i ./images/${PROJECT_NAME}-db.tar
+      #     docker load -i ./images/${PROJECT_NAME}-server.tar
+      #     docker load -i ./images/${PROJECT_NAME}-client.tar
       - name: Load Docker Images
         run: |
+          if [[ "${{ steps.cache-images-restore.outputs.cache-hit }}" == "true" ]]; then
+            echo "Cache hit for Docker images. Loading from cached .tar files."
+          else
+            echo "Cache miss. Loading from recently built .tar files (which might have been new from docker_build)."
+          fi
+
           PROJECT_NAME="ccse-cw2"
           docker load -i ./images/${PROJECT_NAME}-db.tar
           docker load -i ./images/${PROJECT_NAME}-server.tar
           docker load -i ./images/${PROJECT_NAME}-client.tar
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -121,13 +154,42 @@ jobs:
         image: docker:dind # Docker in Docker
         options: --privileged # Required for DinD
     steps:
-      - name: Download Docker Images Artifacts
-        uses: actions/download-artifact@v4
+      # - name: Download Docker Images Artifacts
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: docker-images
+      #     path: ./images/
+      # - name: Load Docker Images
+      #   run: |
+      #     PROJECT_NAME="ccse-cw2"
+      #     docker load -i ./images/${PROJECT_NAME}-db.tar
+      #     docker load -i ./images/${PROJECT_NAME}-server.tar
+      #     docker load -i ./images/${PROJECT_NAME}-client.tar
+
+      - name: Define Image Cache Key (for restore)
+        id: cache-key-gen
+        run: |
+          echo "cache_key=${{ runner.os }}-docker-images-${{ github.sha }}-${{ hashFiles('**/Dockerfile', 'docker-compose.yml') }}" >> $GITHUB_OUTPUT
+
+      # --- NEW: Restore cached Docker Images (.tar files) ---
+      - name: Restore Docker Image Cache
+        uses: actions/cache@v4
+        id: cache-images-restore
         with:
-          name: docker-images
           path: ./images/
+          key: ${{ steps.cache-key-gen.outputs.cache_key }}
+          restore-keys: |
+            ${{ runner.os }}-docker-images-
+            ${{ runner.os }}-
+
       - name: Load Docker Images
         run: |
+          if [[ "${{ steps.cache-images-restore.outputs.cache-hit }}" == "true" ]]; then
+            echo "Cache hit for Docker images. Loading from cached .tar files."
+          else
+            echo "Cache miss. Loading from recently built .tar files."
+          fi
+
           PROJECT_NAME="ccse-cw2"
           docker load -i ./images/${PROJECT_NAME}-db.tar
           docker load -i ./images/${PROJECT_NAME}-server.tar
