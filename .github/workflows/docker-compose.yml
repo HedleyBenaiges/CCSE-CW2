@@ -1,16 +1,15 @@
 name: CI-CD Pipeline
 
-permissions:
-  contents: read
-  security-events: write
-  actions: read
-
 on:
   push:
 
 jobs:
   static_analysis:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4 # Clones repo to $GITHUB_WORKSPACE
@@ -95,6 +94,10 @@ jobs:
   dynamic_analysis:
     needs: docker_build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write # For Code Scanning if ZAP uploads SARIF to it
+      issues: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
