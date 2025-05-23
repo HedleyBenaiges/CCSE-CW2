@@ -45,9 +45,7 @@ jobs:
         run: docker compose build
 
       - name: Run Integration tests
-        run: 
-        - npm install
-        - docker compose run --rm node --test
+        run: npm install && node --test
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
