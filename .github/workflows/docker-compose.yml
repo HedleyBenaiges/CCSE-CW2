@@ -27,9 +27,6 @@ jobs:
           sarif_file: snyk.sarif
   
   build:
-    needs: 
-      - security
-      - build
     runs-on: ubuntu-latest
     container: docker:latest
     services:
