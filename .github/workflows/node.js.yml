@@ -29,14 +29,26 @@ jobs:
   
   docker_build:
     runs-on: ubuntu-latest
-    container: docker:latest
-    services:
-      docker:dind:
-        image: docker:dind # Docker in Docker
-        options: --privileged # Required for DinD
+    # container: docker:latest
+    # services:
+    #   docker:dind:
+    #     image: docker:dind # Docker in Docker
+    #     options: --privileged # Required for DinD
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Start DinD
+        run: |
+          docker run --privileged --rm -d --network host --name dind-daemon docker:dind
+          echo "DOCKER_HOST=tcp://localhost:2375" >> $GITHUB_ENV # Set DOCKER_HOST for subsequent steps
+          # Wait for DinD to be ready
+          for i in $(seq 1 10); do
+            docker info && break
+            echo "Waiting for DinD..."
+            sleep 1
+          done
+
       - name: Set up QEMU # adds support to more platforms (optional)
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
