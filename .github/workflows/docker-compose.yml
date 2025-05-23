@@ -45,7 +45,9 @@ jobs:
         run: docker compose build
 
       - name: Run Integration tests
-        run: docker compose run --rm node --test
+        run: 
+        - npm install
+        - docker compose run --rm node --test
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -55,7 +57,7 @@ jobs:
 
       - name: Push to Docker Hub
         run: | 
-          PROJECT_NAME="ccse-cw2"
+          PROJECT_NAME="ccse-cw3"
           IMAGE_TAG="${{ github.sha }}"
           DOCKERHUB_REPO="hedleyb/ccse-cw2"
 
