@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Copy json to working dir // So not all dependependencies are cached
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
 # Copy the rest files to the working dir
 COPY . .
