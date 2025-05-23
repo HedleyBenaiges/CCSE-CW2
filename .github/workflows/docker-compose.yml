@@ -2,14 +2,14 @@ name: CI-CD Pipeline
 
 permissions:
   contents: read
-  security-events: write
+  static_analysis-events: write
   actions: read
 
 on:
   push:
 
 jobs:
-  security:
+  static_analysis:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,7 +26,7 @@ jobs:
         with:
           sarif_file: snyk.sarif
   
-  docker:
+  build:
     runs-on: ubuntu-latest
     container: docker:latest
     services:
@@ -44,8 +44,77 @@ jobs:
       - name: Build with Docker compose
         run: docker compose build
 
-      - name: Run Integration tests
-        run: npm install && node --test
+      - name: Save Docker Images
+        run: |
+          PROJECT_NAME="ccse-cw2"
+          mkdir -p ./images
+
+          # Save each image to a tar file
+          docker save "${PROJECT_NAME}-db:latest" -o ./images/${PROJECT_NAME}-db.tar
+          docker save "${PROJECT_NAME}-server:latest" -o ./images/${PROJECT_NAME}-server.tar
+          docker save "${PROJECT_NAME}-client:latest" -o ./images/${PROJECT_NAME}-client.tar
+      - name: Upload Docker Images as Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-images
+          path: ./images/
+          retention-days: 1 # Adjust retention as needed
+
+  tests:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    container: docker:latest
+    services:
+      docker:dind:
+        image: docker:dind # Docker in Docker
+        options: --privileged # Required for DinD
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Docker Images Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-images
+          path: ./images/
+      - name: Load Docker Images
+        run: |
+          PROJECT_NAME="ccse-cw2"
+          docker load -i ./images/${PROJECT_NAME}-db.tar
+          docker load -i ./images/${PROJECT_NAME}-server.tar
+          docker load -i ./images/${PROJECT_NAME}-client.tar
+
+      - name: Use Node.js 
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - run: npm ci
+      - run: node --test
+
+  docker:
+    needs: 
+      - static_analysis
+      - build
+      - tests
+    runs-on: ubuntu-latest
+    container: docker:latest
+    services:
+      docker:dind:
+        image: docker:dind # Docker in Docker
+        options: --privileged # Required for DinD
+    steps:
+      - name: Download Docker Images Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-images
+          path: ./images/
+      - name: Load Docker Images
+        run: |
+          PROJECT_NAME="ccse-cw2"
+          docker load -i ./images/${PROJECT_NAME}-db.tar
+          docker load -i ./images/${PROJECT_NAME}-server.tar
+          docker load -i ./images/${PROJECT_NAME}-client.tar
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -55,7 +124,7 @@ jobs:
 
       - name: Push to Docker Hub
         run: | 
-          PROJECT_NAME="ccse-cw3"
+          PROJECT_NAME="ccse-cw2"
           IMAGE_TAG="${{ github.sha }}"
           DOCKERHUB_REPO="hedleyb/ccse-cw2"
 
@@ -76,6 +145,15 @@ jobs:
           docker push "${DOCKERHUB_REPO}-client:${IMAGE_TAG}"
           docker tag "${PROJECT_NAME}-client:latest" "hedleyb/ccse-cw2-client:latest"
           docker push "${DOCKERHUB_REPO}-client:latest"
+  # tests:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: jmalvarezf-lmes/docker-compose-action@v1.4.0
+  #       with:
+  #         compose-file: docker-compose.yml
+  #         test-command: "node --test"
 
   # deploy:
   #   name: Deploy to Render
