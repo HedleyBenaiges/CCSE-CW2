@@ -45,7 +45,7 @@ jobs:
         run: docker compose build
 
       - name: Run Integration tests
-        run: node --test
+        run: docker compose run --rm node --test
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
