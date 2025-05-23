@@ -27,3 +27,5 @@ db.sequelize.sync().then(() => {
 // API Router
 const Router = require('./api') // Local route to file
 app.use("/", Router) // URI to make request
+
+module.exports = app // Exporting app for testing
