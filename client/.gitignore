@@ -7,7 +7,7 @@
 
 # Env
 .env
-./.env
+./*/.env
 
 # testing
 /coverage
