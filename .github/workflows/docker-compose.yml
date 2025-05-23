@@ -60,7 +60,7 @@ jobs:
           path: ./images/
           retention-days: 1 # Adjust retention as needed
 
-  tests:
+  integration_testing:
     needs:
       - build
     runs-on: ubuntu-latest
@@ -96,7 +96,7 @@ jobs:
     needs: 
       - static_analysis
       - build
-      - tests
+      - integration_testing
     runs-on: ubuntu-latest
     container: docker:latest
     services:
@@ -145,7 +145,7 @@ jobs:
           docker push "${DOCKERHUB_REPO}-client:${IMAGE_TAG}"
           docker tag "${PROJECT_NAME}-client:latest" "hedleyb/ccse-cw2-client:latest"
           docker push "${DOCKERHUB_REPO}-client:latest"
-  # tests:
+  # integration_testing:
   #   needs: build
   #   runs-on: ubuntu-latest
   #   steps:
