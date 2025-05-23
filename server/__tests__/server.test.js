@@ -1,7 +1,8 @@
 const assert = require('assert/strict'); // Keep this for assertions
-const { describe, it } = require('node:test');
+// const { describe, it } = require('node:test');
 const request = require('supertest');
 const app = require('../server'); // Imported from server.js
+const { products, users } = require('./models') // Imports products table from database
 
 describe('GET /products/', () => {
     it('should return a list of products', async () => {
@@ -13,6 +14,13 @@ describe('GET /products/', () => {
 
 describe("Testing Product APIs", () => {
     test("GET /products", () => {
-        assert.strictEqual(1, 1);
+
+        expect.strictEqual(1, 1);
+    });
+});
+
+describe("Fail test", () => {
+    test("GET /products", () => {
+        expect.strictEqual(1, 2);
     });
 });
