@@ -119,8 +119,3 @@ jobs:
     #       serviceId: ${{ secrets.RENDER_SERVICE_ID }}
     #       apiKey: ${{ secrets.RENDER_API_KEY }}
     #       multipleDeployment: false # default is true
-
-
-
-          # TODO: add localhost URL to .env file
-          # This way it can be replaced when deploying to Render
