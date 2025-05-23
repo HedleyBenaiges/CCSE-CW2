@@ -3,6 +3,11 @@ name: CI-CD Pipeline
 on:
   push:
 
+permissions:
+  contents: replaced
+  security-events: write
+  actions: read
+
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
@@ -18,10 +23,14 @@ jobs:
       - name: Run Snyk to check for vulnerabilites on server
         uses: snyk/actions/node@master # Image: snyk/snyk:node-18 ?
         with:
-          args: --all-projects # --file=./server --package-manager=npm 
+          args: --all-projects --sarif-file-output=snyk.sarif
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      - name: Upload result to Github Code Scanning
+        uses: github/codeq1-action/upload-sarif@v3
+        with:
+          sarif_file: snyk.sarif
   docker:
     needs: security
     runs-on: ubuntu-latest
@@ -47,8 +56,6 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: List Docker Images
-        run: docker images
 
       - name: Push to Docker Hub
         run: | 
