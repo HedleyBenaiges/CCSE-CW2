@@ -27,6 +27,10 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --file=./client --package-manager=npm --sarif-file-output=snyk.sarif
+      - name: Upload result to Github Code Scanning
+        uses: github/codeql-action/upload-sarif@v2 # v2 deprecated
+        with:
+          sarif_file: snyk.sarif
 
       - name: Run Snyk to check for vulnerabilites on server
         uses: snyk/actions/node@master # Image: snyk/snyk:node-18 ?
@@ -36,11 +40,11 @@ jobs:
         with:
           # args: --all-projects --sarif-file-output=snyk.sarif
           args: --file=./server --package-manager=npm --sarif-file-output=snyk.sarif
-
       - name: Upload result to Github Code Scanning
-        uses: github/codeql-action/upload-sarif@v3 # v2 deprecated
+        uses: github/codeql-action/upload-sarif@v2 # v2 deprecated
         with:
           sarif_file: snyk.sarif
+
   docker:
     needs: security
     runs-on: ubuntu-latest
