@@ -85,14 +85,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Use Node.js 
-        uses: actions/setup-node@v4
-        with:
-          node-version: v18.19.0
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run build --if-present
-      - run: npm test
+      - name: Spin up container
+        run: docker compose up
+      - name: Run integration tests
+        run: npm test
 
   dynamic_analysis:
     needs: docker_build
