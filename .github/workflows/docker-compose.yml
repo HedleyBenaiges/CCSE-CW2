@@ -3,11 +3,6 @@ name: CI-CD Pipeline
 on:
   push:
 
-permissions:
-  contents: replaced
-  security-events: write
-  actions: read
-
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
