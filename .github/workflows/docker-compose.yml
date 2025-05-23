@@ -23,7 +23,7 @@ jobs:
         with:
           args: --all-projects --sarif-file-output=snyk.sarif
       - name: Upload result to Github Code Scanning
-        uses: github/codeq1-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: snyk.sarif
   docker:
