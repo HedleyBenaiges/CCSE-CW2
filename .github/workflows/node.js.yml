@@ -13,17 +13,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4 # Clones repo to $GITHUB_WORKSPACE
-      - name: Run Snyk to check for vulnerabilites on server
-        uses: snyk/actions/node@master # Image: snyk/snyk:node-18 ?
-        continue-on-error: true
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --all-projects --sarif-file-output=snyk.sarif
-      - name: Upload result to Github Code Scanning
-        uses: github/codeql-action/upload-sarif@v3 # v2 deprecated
-        with:
-          sarif_file: snyk.sarif
+        # TODO: Commented out as Snyk has limited uses per month
+
+      # - name: Run Snyk to check for vulnerabilites on server
+      #   uses: snyk/actions/node@master # Image: snyk/snyk:node-18 ?
+      #   continue-on-error: true
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      #   with:
+      #     args: --all-projects --sarif-file-output=snyk.sarif
+      # - name: Upload result to Github Code Scanning
+      #   uses: github/codeql-action/upload-sarif@v3 # v2 deprecated
+      #   with:
+      #     sarif_file: snyk.sarif
   
   docker_build:
     runs-on: ubuntu-latest
