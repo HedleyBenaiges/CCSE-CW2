@@ -60,9 +60,8 @@ jobs:
           path: ./images/
           retention-days: 1 # Adjust retention as needed
 
-  docker:
-    needs: 
-      - security
+  tests:
+    needs:
       - build
     runs-on: ubuntu-latest
     container: docker:latest
@@ -76,11 +75,40 @@ jobs:
         with:
           name: docker-images
           path: ./images/
-
       - name: Load Docker Images
         run: |
           PROJECT_NAME="ccse-cw2"
-          
+          docker load -i ./images/${PROJECT_NAME}-db.tar
+          docker load -i ./images/${PROJECT_NAME}-server.tar
+          docker load -i ./images/${PROJECT_NAME}-client.tar
+      - name: Running Unit Tests
+        uses: actions/checkout@v3
+      - uses: jmalvarezf-lmes/docker-compose-action@v1.4.0
+        with:
+          compose-file: docker-compose.yml
+          test-command: "node --test"
+
+
+  docker:
+    needs: 
+      - security
+      - build
+      - tests
+    runs-on: ubuntu-latest
+    container: docker:latest
+    services:
+      docker:dind:
+        image: docker:dind # Docker in Docker
+        options: --privileged # Required for DinD
+    steps:
+      - name: Download Docker Images Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-images
+          path: ./images/
+      - name: Load Docker Images
+        run: |
+          PROJECT_NAME="ccse-cw2"
           docker load -i ./images/${PROJECT_NAME}-db.tar
           docker load -i ./images/${PROJECT_NAME}-server.tar
           docker load -i ./images/${PROJECT_NAME}-client.tar
