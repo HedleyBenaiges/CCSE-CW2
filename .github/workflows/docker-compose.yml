@@ -109,8 +109,6 @@ jobs:
           render-api-key: ${{ secrets.RENDER_API_KEY }}
           wait-for-deploy: true
 
-
-
     #   - name: Checkout
     #     uses: actions/checkout@v4
     #   - name: Trigger deployment
