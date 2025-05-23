@@ -2,7 +2,7 @@ name: CI-CD Pipeline
 
 permissions:
   contents: read
-  static_analysis-events: write
+  security-events: write
   actions: read
 
 on:
