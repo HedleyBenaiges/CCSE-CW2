@@ -80,34 +80,34 @@ jobs:
           docker push "${DOCKERHUB_REPO}-client:${IMAGE_TAG}"
           docker tag "${PROJECT_NAME}-client:latest" "hedleyb/ccse-cw2-client:latest"
           docker push "${DOCKERHUB_REPO}-client:latest"
-  deploy:
-    name: Deploy to Render
-    needs: docker
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy Database
-        uses: gh-actions-workflows/deploy-docker-render@v1.1
-        with:
-          deploy-hook: ${{ secrets.RENDER_DEPLOY_HOOK }}
-          image-url: ${{ needs.publish.outputs.image_name }}
-          render-api-key: ${{ secrets.RENDER_API_KEY }}
-          wait-for-deploy: true
+  # deploy:
+  #   name: Deploy to Render
+  #   needs: docker
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Deploy Database
+  #       uses: gh-actions-workflows/deploy-docker-render@v1.1
+  #       with:
+  #         deploy-hook: ${{ secrets.RENDER_DEPLOY_HOOK }}
+  #         image-url: ${{ needs.publish.outputs.image_name }}
+  #         render-api-key: ${{ secrets.RENDER_API_KEY }}
+  #         wait-for-deploy: true
 
-      - name: Deploy Server
-        uses: gh-actions-workflows/deploy-docker-render@v1.1
-        with:
-          deploy-hook: ${{ secrets.RENDER_DEPLOY_HOOK }}
-          image-url: ${{ needs.publish.outputs.image_name }}
-          render-api-key: ${{ secrets.RENDER_API_KEY }}
-          wait-for-deploy: true
+  #     - name: Deploy Server
+  #       uses: gh-actions-workflows/deploy-docker-render@v1.1
+  #       with:
+  #         deploy-hook: ${{ secrets.RENDER_DEPLOY_HOOK }}
+  #         image-url: ${{ needs.publish.outputs.image_name }}
+  #         render-api-key: ${{ secrets.RENDER_API_KEY }}
+  #         wait-for-deploy: true
 
-      - name: Deploy Client
-        uses: gh-actions-workflows/deploy-docker-render@v1.1
-        with:
-          deploy-hook: ${{ secrets.RENDER_DEPLOY_HOOK }}
-          image-url: ${{ needs.publish.outputs.image_name }}
-          render-api-key: ${{ secrets.RENDER_API_KEY }}
-          wait-for-deploy: true
+  #     - name: Deploy Client
+  #       uses: gh-actions-workflows/deploy-docker-render@v1.1
+  #       with:
+  #         deploy-hook: ${{ secrets.RENDER_DEPLOY_HOOK }}
+  #         image-url: ${{ needs.publish.outputs.image_name }}
+  #         render-api-key: ${{ secrets.RENDER_API_KEY }}
+  #         wait-for-deploy: true
 
     #   - name: Checkout
     #     uses: actions/checkout@v4
