@@ -86,8 +86,11 @@ jobs:
         with:
           node-version: '18' # Use the same version as in Dockerfile
       - run: npm ci
+        working-directory: ./server
       - run: npm run build --if-present
+        working-directory: ./server
       - run: npm test
+        working-directory: ./server
         # run: docker compose up --abort-on-container-exit --exit-code-from tests
 
   dynamic_analysis:
