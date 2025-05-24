@@ -41,14 +41,5 @@ services:
         condition: service_started
         restart: true
 
-  tests:
-    build: 
-      context: ./server
-      dockerfile: Dockerfile
-    command: ["npm", "ci", "&&", "npm", "run", "build", "--if-present", "&&", "npm", "test"]
-    depends_on:
-      db:
-        condition: service_healthy # Tests wait for DB to be healthy
-
 volumes:
   db_data:
