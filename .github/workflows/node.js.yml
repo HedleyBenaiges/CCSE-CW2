@@ -86,8 +86,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run Integration Tests
-        run: docker compose up --abort-on-container-exit --exit-code-from tests
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Use the same version as in Dockerfile
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: npm test
+        # run: docker compose up --abort-on-container-exit --exit-code-from tests
 
   dynamic_analysis:
     needs: docker_build
