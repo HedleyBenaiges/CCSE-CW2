@@ -181,7 +181,7 @@ jobs:
 #           docker push "${DOCKERHUB_REPO}-client:latest"
   
   azure_deploy:
-    needs: docker_hub
+    # needs: docker_hub
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
