@@ -20,9 +20,14 @@ app.use(function(req, res, next) {
 const db = require('./models')
 
 // Creating tables in postgres
-db.sequelize.sync().then(() => {
-  app.listen(5000, () => { console.log("Server started on port 5000") })
-})
+if (require.main === module) { // If run directly (for testing), ignore
+  db.sequelize.sync().then(() => {
+      app.listen(5000, () => { console.log("Server started on port 5000") })
+  }).catch(err => {
+      console.error("Unable to connect to the database:", err);
+      process.exit(1); // Exit with failure
+  });
+}
 
 // API Router
 const Router = require('./api') // Local route to file
