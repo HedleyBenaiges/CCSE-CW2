@@ -10,7 +10,7 @@
     "username": "postgres",
     "password": "postgres",
     "database": "securecartdb",
-    "host": "db",
+    "host": "localhost",
     "dialect": "postgres"
   },
   "production": {
