@@ -4,184 +4,183 @@ on:
   push:
 
 jobs:
-#   static_analysis:
-#     runs-on: ubuntu-latest
-#     permissions:
-#       contents: read
-#       security-events: write
-#       actions: read
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v4 # Clones repo to $GITHUB_WORKSPACE
-#         # TODO: Commented out as Snyk has limited uses per month
-
-#       # - name: Run Snyk to check for vulnerabilites on server
-#       #   uses: snyk/actions/node@master # Image: snyk/snyk:node-18 ?
-#       #   continue-on-error: true
-#       #   env:
-#       #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-#       #   with:
-#       #     args: --all-projects --sarif-file-output=snyk.sarif
-#       # - name: Upload result to Github Code Scanning
-#       #   uses: github/codeql-action/upload-sarif@v3 # v2 deprecated
-#       #   with:
-#       #     sarif_file: snyk.sarif
+  static_analysis:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4 # Clones repo to $GITHUB_WORKSPACE
+        # TODO: Comment out as Snyk has limited uses per month
+      - name: Run Snyk to check for vulnerabilites on server
+        uses: snyk/actions/node@master # Image: snyk/snyk:node-18 ?
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --all-projects --sarif-file-output=snyk.sarif
+      - name: Upload result to Github Code Scanning
+        uses: github/codeql-action/upload-sarif@v3 # v2 deprecated
+        with:
+          sarif_file: snyk.sarif
   
-#   docker_build:
-#     runs-on: ubuntu-latest
-#     container: docker:latest
-#     services:
-#       docker:dind:
-#         image: docker:dind # Docker in Docker
-#         options: --privileged # Required for DinD
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v4
-#       - name: Set up QEMU # adds support to more platforms (optional)
-#         uses: docker/setup-qemu-action@v3
-#       - name: Set up Docker Buildx
-#         uses: docker/setup-buildx-action@v3
+  docker_build:
+    runs-on: ubuntu-latest
+    container: docker:latest
+    services:
+      docker:dind:
+        image: docker:dind # Docker in Docker
+        options: --privileged # Required for DinD
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up QEMU # adds support to more platforms (optional)
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-#       - name: Build with Docker compose
-#         run: docker compose build
+      - name: Build with Docker compose
+        run: docker compose build
 
-#       - name: Save Docker Images
-#         run: |
-#           PROJECT_NAME="ccse-cw2"
-#           mkdir -p ./images
+      - name: Save Docker Images
+        run: |
+          PROJECT_NAME="ccse-cw2"
+          mkdir -p ./images
 
-#           # Save each image to a tar file
-#           docker save "${PROJECT_NAME}-db:latest" -o ./images/${PROJECT_NAME}-db.tar
-#           docker save "${PROJECT_NAME}-server:latest" -o ./images/${PROJECT_NAME}-server.tar
-#           docker save "${PROJECT_NAME}-client:latest" -o ./images/${PROJECT_NAME}-client.tar
+          # Save each image to a tar file
+          docker save "${PROJECT_NAME}-db:latest" -o ./images/${PROJECT_NAME}-db.tar
+          docker save "${PROJECT_NAME}-server:latest" -o ./images/${PROJECT_NAME}-server.tar
+          docker save "${PROJECT_NAME}-client:latest" -o ./images/${PROJECT_NAME}-client.tar
 
-#       - name: Upload Docker Images as Artifacts
-#         uses: actions/upload-artifact@v4
-#         with:
-#           name: docker-images
-#           path: ./images/
-#           retention-days: 1 # Adjust retention as needed
+      - name: Upload Docker Images as Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-images
+          path: ./images/
+          retention-days: 1 # Adjust retention as needed
 
-#   integration_testing:
-#     needs:
-#       - docker_build
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Download Docker Images Artifacts
-#         uses: actions/download-artifact@v4
-#         with:
-#           name: docker-images
-#           path: ./images/
-#       - name: Load Docker Images
-#         run: |
-#           PROJECT_NAME="ccse-cw2"
-#           docker load -i ./images/${PROJECT_NAME}-db.tar
-#           docker load -i ./images/${PROJECT_NAME}-server.tar
-#           docker load -i ./images/${PROJECT_NAME}-client.tar
-#       - name: Checkout
-#         uses: actions/checkout@v4
+  integration_testing:
+    needs:
+      - docker_build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Docker Images Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-images
+          path: ./images/
+      - name: Load Docker Images
+        run: |
+          PROJECT_NAME="ccse-cw2"
+          docker load -i ./images/${PROJECT_NAME}-db.tar
+          docker load -i ./images/${PROJECT_NAME}-server.tar
+          docker load -i ./images/${PROJECT_NAME}-client.tar
+      - name: Checkout
+        uses: actions/checkout@v4
 
-#       - name: Use Node.js
-#         uses: actions/setup-node@v4
-#         with:
-#           node-version: '18' # Use the same version as in Dockerfile
-#       - run: npm ci
-#         working-directory: ./server
-#       - run: npm run build --if-present
-#         working-directory: ./server
-#       - run: docker compose up -d
-#       - run: npm test
-#         working-directory: ./server
-#         # run: docker compose up --abort-on-container-exit --exit-code-from tests
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Use the same version as in Dockerfile
+      - run: npm ci
+        working-directory: ./server
+      - run: npm run build --if-present
+        working-directory: ./server
+      - run: docker compose up -d
+      - run: npm test
+        working-directory: ./server
+        # run: docker compose up --abort-on-container-exit --exit-code-from tests
 
-#   dynamic_analysis:
-#     needs: docker_build
-#     runs-on: ubuntu-latest
-#     permissions:
-#       contents: read
-#       security-events: write # For Code Scanning if ZAP uploads SARIF to it
-#       issues: write
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v4
-#       - name: Download Docker Images Artifacts
-#         uses: actions/download-artifact@v4
-#         with:
-#           name: docker-images
-#           path: ./images/
-#       - name: Load Docker Images
-#         run: |
-#           PROJECT_NAME="ccse-cw2"
-#           docker load -i ./images/${PROJECT_NAME}-db.tar
-#           docker load -i ./images/${PROJECT_NAME}-server.tar
-#           docker load -i ./images/${PROJECT_NAME}-client.tar
-#       - name: Run the docker containers
-#         run: docker compose up -d
-#       - name: Scanning with Zap
-#         uses: zaproxy/action-full-scan@v0.12.0
-#         with:
-#           token: ${{ secrets.GITHUB_TOKEN }}
-#           docker_name: 'ghcr.io/zaproxy/zaproxy:stable'
-#           target: 'http://localhost:3000'
-#           fail_action: 'false'
+  dynamic_analysis:
+    needs: docker_build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write # For Code Scanning if ZAP uploads SARIF to it
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download Docker Images Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-images
+          path: ./images/
+      - name: Load Docker Images
+        run: |
+          PROJECT_NAME="ccse-cw2"
+          docker load -i ./images/${PROJECT_NAME}-db.tar
+          docker load -i ./images/${PROJECT_NAME}-server.tar
+          docker load -i ./images/${PROJECT_NAME}-client.tar
+      - name: Run the docker containers
+        run: docker compose up -d
+      - name: Scanning with Zap
+        uses: zaproxy/action-full-scan@v0.12.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          docker_name: 'ghcr.io/zaproxy/zaproxy:stable'
+          target: 'http://localhost:3000'
+          fail_action: 'false'
 
-#   docker_hub:
-#     needs: 
-#       - static_analysis
-#       - docker_build
-#       - integration_testing
-#       - dynamic_analysis
-#     runs-on: ubuntu-latest
-#     container: docker:latest
-#     services:
-#       docker:dind:
-#         image: docker:dind # Docker in Docker
-#         options: --privileged # Required for DinD
-#     steps:
-#       - name: Download Docker Images Artifacts
-#         uses: actions/download-artifact@v4
-#         with:
-#           name: docker-images
-#           path: ./images/
-#       - name: Load Docker Images
-#         run: |
-#           PROJECT_NAME="ccse-cw2"
-#           docker load -i ./images/${PROJECT_NAME}-db.tar
-#           docker load -i ./images/${PROJECT_NAME}-server.tar
-#           docker load -i ./images/${PROJECT_NAME}-client.tar
+  docker_hub:
+    needs: 
+      - static_analysis
+      - docker_build
+      - integration_testing
+      - dynamic_analysis
+    runs-on: ubuntu-latest
+    container: docker:latest
+    services:
+      docker:dind:
+        image: docker:dind # Docker in Docker
+        options: --privileged # Required for DinD
+    steps:
+      - name: Download Docker Images Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-images
+          path: ./images/
+      - name: Load Docker Images
+        run: |
+          PROJECT_NAME="ccse-cw2"
+          docker load -i ./images/${PROJECT_NAME}-db.tar
+          docker load -i ./images/${PROJECT_NAME}-server.tar
+          docker load -i ./images/${PROJECT_NAME}-client.tar
 
-#       - name: Login to Docker Hub
-#         uses: docker/login-action@v3
-#         with:
-#           username: ${{ vars.DOCKERHUB_USERNAME }}
-#           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-#       - name: Push to Docker Hub
-#         run: | 
-#           PROJECT_NAME="ccse-cw2"
-#           IMAGE_TAG="${{ github.sha }}"
-#           DOCKERHUB_REPO="hedleyb/ccse-cw2"
+      - name: Push to Docker Hub
+        run: | 
+          PROJECT_NAME="ccse-cw2"
+          IMAGE_TAG="${{ github.sha }}"
+          DOCKERHUB_REPO="hedleyb/ccse-cw2"
 
-#           # Local image name: ccse-cw2-db:latest
-#           # Docker Hub image name: hedleyb/ccse-cw2-db:latest
-#           # Alt: Docker Hub image: hedleyb/ccse-cw2:db-latest # Not doing thia
-#           docker tag "${PROJECT_NAME}-db:latest" "${DOCKERHUB_REPO}-db:${IMAGE_TAG}"
-#           docker push "${DOCKERHUB_REPO}-db:${IMAGE_TAG}"
-#           docker tag "${PROJECT_NAME}-db:latest" "hedleyb/ccse-cw2-db:latest" 
-#           docker push "${DOCKERHUB_REPO}-db:latest"
+          # Local image name: ccse-cw2-db:latest
+          # Docker Hub image name: hedleyb/ccse-cw2-db:latest
+          # Alt: Docker Hub image: hedleyb/ccse-cw2:db-latest # Not doing thia
+          docker tag "${PROJECT_NAME}-db:latest" "${DOCKERHUB_REPO}-db:${IMAGE_TAG}"
+          docker push "${DOCKERHUB_REPO}-db:${IMAGE_TAG}"
+          docker tag "${PROJECT_NAME}-db:latest" "hedleyb/ccse-cw2-db:latest" 
+          docker push "${DOCKERHUB_REPO}-db:latest"
 
-#           docker tag "${PROJECT_NAME}-server:latest" "${DOCKERHUB_REPO}-server:${IMAGE_TAG}"
-#           docker push "${DOCKERHUB_REPO}-server:${IMAGE_TAG}"
-#           docker tag "${PROJECT_NAME}-server:latest" "hedleyb/ccse-cw2-server:latest"
-#           docker push "${DOCKERHUB_REPO}-server:latest"
+          docker tag "${PROJECT_NAME}-server:latest" "${DOCKERHUB_REPO}-server:${IMAGE_TAG}"
+          docker push "${DOCKERHUB_REPO}-server:${IMAGE_TAG}"
+          docker tag "${PROJECT_NAME}-server:latest" "hedleyb/ccse-cw2-server:latest"
+          docker push "${DOCKERHUB_REPO}-server:latest"
 
-#           docker tag "${PROJECT_NAME}-client:latest" "${DOCKERHUB_REPO}-client:${IMAGE_TAG}"
-#           docker push "${DOCKERHUB_REPO}-client:${IMAGE_TAG}"
-#           docker tag "${PROJECT_NAME}-client:latest" "hedleyb/ccse-cw2-client:latest"
-#           docker push "${DOCKERHUB_REPO}-client:latest"
+          docker tag "${PROJECT_NAME}-client:latest" "${DOCKERHUB_REPO}-client:${IMAGE_TAG}"
+          docker push "${DOCKERHUB_REPO}-client:${IMAGE_TAG}"
+          docker tag "${PROJECT_NAME}-client:latest" "hedleyb/ccse-cw2-client:latest"
+          docker push "${DOCKERHUB_REPO}-client:latest"
   
   azure_deploy:
-    # needs: docker_hub
+    needs: docker_hub
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
