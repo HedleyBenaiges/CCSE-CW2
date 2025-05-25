@@ -184,29 +184,6 @@ azure_deploy:
   needs: docker_hub
   runs-on: ubuntu-latest
   steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Login to Azure Container Registry
-      uses: azure/docker-login@v1
-      with:
-        login-server: ${{ secrets.AZURE_CONTAINER_REGISTRY_LOGIN_SERVER }}
-        username: ${{ secrets.AZURE_CONTAINER_REGISTRY_USERNAME }}
-        password: ${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
-
-    - name: Build and Push Docker Images to Azure Container Registry
-      run: |
-        PROJECT_NAME="ccse-cw2"
-        IMAGE_TAG="${{ github.sha }}"
-        az acr build --registry ${{ secrets.AZURE_CONTAINER_REGISTRY_NAME }} --image "${PROJECT_NAME}-db:${IMAGE_TAG}" --file ./docker/db/Dockerfile .
-        az acr build --registry ${{ secrets.AZURE_CONTAINER_REGISTRY_NAME }} --image "${PROJECT_NAME}-server:${IMAGE_TAG}" --file ./docker/server/Dockerfile .
-        az acr build --registry ${{ secrets.AZURE_CONTAINER_REGISTRY_NAME }} --image "${PROJECT_NAME}-client:${IMAGE_TAG}" --file ./docker/client/Dockerfile .
-
-
-azure_deploy:
-  needs: docker_hub
-  runs-on: ubuntu-latest
-  steps:
   - name: Checkout code
     uses: actions/checkout@v4,
   - name: Log in to Azure
