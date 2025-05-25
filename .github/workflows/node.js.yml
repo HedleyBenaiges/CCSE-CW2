@@ -196,7 +196,7 @@ jobs:
         --name hb-securecart \
         --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
         --multicontainer-config-type compose \
-        --multicontainer-config-file az.compose.yml,
+        --multicontainer-config-file az.compose.yml
         az webapp restart \
           --name hb-securecart \
           --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }}
