@@ -67,17 +67,17 @@ jobs:
       - docker_build
     runs-on: ubuntu-latest
     steps:
-      - name: Download Docker Images Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: docker-images
-          path: ./images/
-      - name: Load Docker Images
-        run: |
-          PROJECT_NAME="ccse-cw2"
-          docker load -i ./images/${PROJECT_NAME}-db.tar
-          docker load -i ./images/${PROJECT_NAME}-server.tar
-          docker load -i ./images/${PROJECT_NAME}-client.tar
+      # - name: Download Docker Images Artifacts
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: docker-images
+      #     path: ./images/
+      # - name: Load Docker Images
+      #   run: |
+      #     PROJECT_NAME="ccse-cw2"
+      #     docker load -i ./images/${PROJECT_NAME}-db.tar
+      #     docker load -i ./images/${PROJECT_NAME}-server.tar
+      #     docker load -i ./images/${PROJECT_NAME}-client.tar
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -104,17 +104,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Download Docker Images Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: docker-images
-          path: ./images/
-      - name: Load Docker Images
-        run: |
-          PROJECT_NAME="ccse-cw2"
-          docker load -i ./images/${PROJECT_NAME}-db.tar
-          docker load -i ./images/${PROJECT_NAME}-server.tar
-          docker load -i ./images/${PROJECT_NAME}-client.tar
+      # - name: Download Docker Images Artifacts
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: docker-images
+      #     path: ./images/
+      # - name: Load Docker Images
+        # run: |
+        #   PROJECT_NAME="ccse-cw2"
+        #   docker load -i ./images/${PROJECT_NAME}-db.tar
+        #   docker load -i ./images/${PROJECT_NAME}-server.tar
+        #   docker load -i ./images/${PROJECT_NAME}-client.tar
       - name: Run the docker containers
         run: docker compose up -d
       - name: Scanning with Zap
