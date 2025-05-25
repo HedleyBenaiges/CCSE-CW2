@@ -4,9 +4,6 @@ const request = require('supertest');
 const app = require('../server'); // Imported from server.js
 const { products, users } = require('../models') // Imports products table from database
 const sequelize = require('../models').sequelize; // Sequelize instance for database connection
-const POSTGRES_USER = 'postgres';
-const POSTGRES_PASSWORD = 'postgres';
-const POSTGRES_DB = 'securecartdb';
 
 // beforeAll(async () => {
 //     await sequelize.sync({ force: true }); // Reset database before tests
