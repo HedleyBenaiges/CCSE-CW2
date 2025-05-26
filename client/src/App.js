@@ -18,7 +18,7 @@ function App() {
 
   const updateNav = () => {
     const token = sessionStorage.getItem('access_token');
-    if (token != null) {
+    if (token !== null) {
       setPrivilege(jwtDecode(token).privilege);
     } else { setPrivilege(null) } 
   }
@@ -29,7 +29,7 @@ function App() {
           <Link to="/" className="link"> Store </Link>
           <Link to="/login" className="link"> Log In / Register </Link>
           <Link to="/basket" className="link"> Basket </Link>
-          { privilege == 1 && <Link to="/admin" className="link"> Admin </Link> }
+          { privilege === 1 && <Link to="/admin" className="link"> Admin </Link> }
           <Link to="/admin" className="link"> Admin </Link>
           <Routes>
             {/* URL , exact = render only once, store component */}

@@ -12,7 +12,11 @@ function authenticateToken(req, res, next) {
 
     // && operator stops if authHeader is not null
     const token = authHeader && authHeader.split(" ")[1]; // return token
-    if (token == null) return res.sendStatus(401); // No token
+
+    // Was:
+    // if (token === null) return res.sendStatus(401); // No token
+    // Now:
+    if (token === null) return res.sendStatus(401); // No token
 
     // Verify token with ACCESS_TOKEN_SECRET from .env file
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
@@ -47,7 +51,7 @@ router.get("/products/:id", async (req, res) => {
 });
 
 // TODO: following line
-// if (_products == null) return res.sendStatus(401); // If no product found
+// if (_products === null) return res.sendStatus(401); // If no product found
 
 
 // Takes "product_name" value from post request
@@ -126,14 +130,17 @@ router.post("/users/login", async (req, res) => {
     // (Done) Delete product
 
 router.post("/admin/products/addnew", authenticateToken, async (req, res) => {
-    if (req.user.privilege != 1) return res.sendStatus(403); // If not admin
+    // Was: loose equality check
+    // if (req.user.privilege !== 1) return res.sendStatus(403);
+    // Now: strict equality check
+    if (req.user.privilege !== 1) return res.sendStatus(403); // If not admin
     const product = req.body;
     await products.create(product);
     res.json(product);
    });
 
 router.post("/admin/products/update", authenticateToken, async (req, res) => {
-    if (req.user.privilege != 1) return res.sendStatus(403); // If not admin
+    if (req.user.privilege !== 1) return res.sendStatus(403); // If not admin
     // Should be accessed on single item page, with admin session active
     // Fills all client-side forms with the return of /product/:id/
     // These values should be used by default - Updates everything, 
@@ -151,7 +158,7 @@ router.post("/admin/products/update", authenticateToken, async (req, res) => {
 });
 
 router.post("/admin/products/delete", authenticateToken, async (req, res) => {
-    if (req.user.privilege != 1) return res.sendStatus(403); // If not admin
+    if (req.user.privilege !== 1) return res.sendStatus(403); // If not admin
     // Should also be accessed on single item page
     const product = req.body;
     await products.destroy({ 
@@ -166,7 +173,7 @@ router.post("/admin/products/delete", authenticateToken, async (req, res) => {
     // Remove user account
 // Get all users
 router.get("/admin/users/", authenticateToken, async (req, res) => {
-    if (req.user.privilege != 1) return res.sendStatus(403); // If not admin
+    if (req.user.privilege !== 1) return res.sendStatus(403); // If not admin
     const _users = await users.findAll({
         order: [['user_id', 'ASC']]
     })

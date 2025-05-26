@@ -1,18 +1,19 @@
-# Use base Docker image: node:20-alpine (Linux distro w/ node installed)
-FROM node:20-alpine
+# Base Docker image
+FROM node:24-alpine
 
-# Set working directory in container
+# Working directory in container
 WORKDIR /app
 
-# Copy json to working dir // So not all dependependencies are cached
+# Copy dependencies to working dir, so they can be cached separately
+# Changes to the source code won't invalidate this layer
 COPY package*.json ./
 RUN npm ci
 
-# Copy the rest files to the working dir
+# Copy the rest files to container
 COPY . .
 
-# Expose port 5000
 EXPOSE 5000
-
 CMD [ "npm", "start" ]
-# CMD [ "tail", "-f", "/dev/null" ]
+
+# CMD [ "tail", "-f", "/dev/null" ] # Debug command
+

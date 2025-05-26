@@ -11,7 +11,7 @@ function ViewAllUsers() {
 
   // Gets all users from database
   useEffect(() => {
-    if (token == null || jwtDecode(token).privilege != 1) {
+    if (token === null || jwtDecode(token).privilege !== 1) {
     } else {
       axios.get(`http://localhost:5000/admin/users`).then((res) => {
         setUserList(res.data);

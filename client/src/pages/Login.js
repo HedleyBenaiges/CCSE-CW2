@@ -15,7 +15,7 @@ function App() {
     try {      
       axios.post(`http://localhost:5000/users/login`, data).then((response) => {
         sessionStorage.setItem("access_token", response.data.accessToken);
-        if (response.data.accessToken != null) {
+        if (response.data.accessToken !== null) {
           alert("Logged In");
         } else {
           alert("Login Failed");

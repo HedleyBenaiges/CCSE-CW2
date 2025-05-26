@@ -10,7 +10,7 @@ function Basket() {
   }
   function checkout() {
     let token = sessionStorage.getItem('access_token');
-    if (token == null) {
+    if (token === null) {
       alert("Please log in to checkout")
     } else {
       alert("Checkout success")

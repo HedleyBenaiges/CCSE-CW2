@@ -63,7 +63,7 @@ function Product() {
 
   useEffect( () => {
     const token = sessionStorage.getItem('access_token');
-    if (token != null && jwtDecode(token).privilege == 1) {
+    if (token !== null && jwtDecode(token).privilege === 1) {
       setIsAdmin(true);
     }
   })
@@ -106,7 +106,7 @@ function Product() {
             <div className="discountedPrice">Now: £{( (product.price/100) - (product.discount*(product.price/100)) /100 ).toFixed(2) } </div>
           </div>
         }
-        {product.discount == 0 &&
+        {product.discount === 0 &&
             <div className="Price"> Price: £{( (product.price/100) - (product.discount*(product.price/100)) /100 ).toFixed(2) }</div> 
         }
         <div className="stock"> Stock: {product.stock} </div>

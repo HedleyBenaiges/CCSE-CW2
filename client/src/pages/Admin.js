@@ -12,7 +12,7 @@ function Admin() {
   const token = sessionStorage.getItem('access_token')
   // axios.defaults.headers.common['Authorization'] = `Bearer ${sessionStorage.getItem('access_token')}`;
 
-  if (token == null || jwtDecode(token).privilege != 1) {
+  if (token === null || jwtDecode(token).privilege !== 1) {
     return( <div><br/>You are not authorised to view this page</div>)
   }
 
